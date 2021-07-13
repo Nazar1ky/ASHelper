@@ -173,6 +173,8 @@ function main()
         if update_state then
             downloadUrlToFile(script_url, script_path, function(id, status)
                 if status == dlstatus.STATUS_ENDDOWNLOADDATA then
+                    sampAddChatMessage("Скрипт успешно обновлен! Перезапускаю...")
+                    thisScript():reload()
                 end
             end)
             break
