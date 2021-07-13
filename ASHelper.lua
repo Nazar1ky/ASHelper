@@ -25,7 +25,7 @@ local inprocess = false
 local gender = 0
 
 -- if not _ then
---         sampAddChatMessage("ГЃГЁГЎГ«ГЁГ®ГІГҐГЄГ  imgui Г­ГҐ Г­Г Г©Г¤ГҐГ­Г ... Г“Г±ГІГ Г­Г®ГўГЁГ¬!", -1)
+--         sampAddChatMessage("Библиотека imgui не найдена... Установим!", -1)
 --         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/imgui.lua', 'moonloader/lib/imgui.lua')
 --         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/MoonImGui.dll', 'moonloader/lib/MoonImGui.dll')
 --         thisScript():reload()
@@ -42,22 +42,23 @@ local isp_menu = imgui.ImBool(false)
 local lic_menu = imgui.ImBool(false)
 local other_menu = imgui.ImBool(false)
 local anim_cheat = imgui.ImBool(false)
-local arr_lic = {u8"ГЊГ ГёГЁГ­Г ", u8"ГЊГ®ГІГ®Г¶ГЁГЄГ«Г»", u8"ГђГ»ГЎГ Г«ГЄГ ", u8"Г‹Г®Г¤ГЄГЁ", u8"ГЋГ°ГіГ¦ГЁГҐ", u8"ГђГ Г±ГЄГ®ГЇГЄГЁ", u8"Г’Г ГЄГ±ГЁ"}
+local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
 local selected_item = imgui.ImInt(0)
 
 local ex, ey = getScreenResolution()
 function imgui.OnDrawFrame()
     local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
     if main_window_state.v then
-        imgui.SetNextWindowSize(imgui.ImVec2(580, 200), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(580, 240), imgui.Cond.FirstUseEver)
         imgui.Begin('AutoSchool helper', main_window_state)
-        imgui.InputText(u8'ID Г€ГЈГ°Г®ГЄГ  Г¤Г«Гї Г¬Г Г­ГЁГЇГіГ«ГїГ¶ГЁГ©', playerID)
-        imgui.Checkbox(u8'ГЏГ°ГЁ Г­Г Г¶ГҐГ«ГЁГўГ Г­ГЁГҐ playerID Г§Г ГЇГ®Г«Г­ГїГҐГІГјГ±Гї Г Г©Г¤ГЁ Гў ГІГ®ГЈГ® ГЄГ®ГЈГ® Г¶ГҐГ«ГЁГІГҐГ±Гј', checkbox2)
+        imgui.InputText(u8'ID Игрока для манипуляций', playerID)
+        imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
         imgui.Checkbox(u8'PRICE LIST', isp_menu)
-        imgui.Checkbox(u8'ГЏГ°Г®Г¤Г Г¦Г  Г‹ГЁГ¶ГҐГ­Г§ГЁГ©', lic_menu)
-        imgui.Checkbox(u8'ГЏГ°Г®Г·ГҐГҐ', other_menu)
-        imgui.Checkbox(u8'Г‘ГЎГЁГў Г Г­ГЁГ¬ГЄГЁ Г¤ГіГЎГЁГ­ГЄГЁ (Г—Г€Г’)', anim_cheat)
-        imgui.Text(u8(string.format('Г’ГҐГЄГіГ№Г Гї Г¤Г ГІГ : %s', os.date())))
+        imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
+        imgui.Checkbox(u8'Прочее', other_menu)
+        imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
+        imgui.Text(u8'Script version:' .. script_vers_text)
+        imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
         imgui.End()
     end
     if isp_menu.v then
@@ -65,46 +66,46 @@ function imgui.OnDrawFrame()
         imgui.SetNextWindowSize(imgui.ImVec2(300, 170), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'AutoSchool Helper || PRICE LIST', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'PRICE LIST:\nГЌГ  Г ГўГІГ®: 10.000\nГЌГ  Г¬Г®ГІГ®: 12.000\nГЌГ  Г°Г»ГЎГ Г«ГЄГі: 21.000\nГ‚Г®Г¤Г­Г»Г© ГІГ°Г Г­Г±ГЇГ®Г°ГІ: 20.000\nГЋГ°ГіГ¦ГЁГҐ: 50.000(Г’Г°ГҐГЎГіГҐГІГјГ±Гї ГЊГҐГ¤. ГЄГ Г°ГІГ \nГЋГµГ®ГІГ : 100.000\nГЌГ  Г°Г Г±ГЇГ®ГЇГЄГЁ: 200.000\nГЌГ  ГЇГ®Г«ГҐГІГ» 20.000 (Г‘Г¤Г ГўГ ГІГј Гў Г ГўГЁГ ГёГЄГ®Г«ГҐ)')
+        imgui.Text(u8'PRICE LIST:\nНа авто: 10.000\nНа мото: 12.000\nНа рыбалку: 21.000\nВодный транспорт: 20.000\nОружие: 50.000(Требуеться Мед. карта\nОхота: 100.000\nНа распопки: 200.000\nНа полеты 20.000 (Сдавать в авиашколе)')
         imgui.End()
     end
     if lic_menu.v then
         imgui.ShowCursor = true
         imgui.SetNextWindowSize(imgui.ImVec2(430, 230), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || ГЏГ°Г®Г¤Г Г¦Г  Г«ГЁГ¶ГҐГ­Г§ГЁГ©', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'ГЏГ°ГЁ ГЇГ°Г®Г¤Г Г¦ГҐ Г«ГЁГ¶ГҐГ­Г§ГЁГЁ Г­Г  Г®Г°ГіГ¦ГЁГҐ Г­ГіГ¦Г­Г® ГЇГ°Г®ГўГҐГ°ГЁГІГј Г¬ГҐГ¤. ГЄГ Г°ГІГі!')
-        if imgui.Button(u8'ГЏГ°ГЁГ±ГІГ ГўГЁГІГјГ±Гї') then
+        imgui.Begin(u8'AutoSchool Helper || Продажа лицензий', nil, imgui.WindowFlags.NoCollapse)
+        imgui.Text(u8'При продаже лицензии на оружие нужно проверить мед. карту!')
+        if imgui.Button(u8'Приставиться') then
             privet()
         end
-        if imgui.Button(u8'Г‹ГЁГ¶ГҐГ­Г§ГЁГї Г­Г  ГЇГЁГ«Г®ГІГ ') then
+        if imgui.Button(u8'Лицензия на пилота') then
             pilot()
         end
-        if imgui.Button(u8'ГЏГ°Г®ГўГҐГ°ГЁГІГј Г¬ГҐГ¤. ГЄГ Г°ГІГі') then
+        if imgui.Button(u8'Проверить мед. карту') then
                 med(myid)
         end
-        if imgui.Button(u8'Г‚Г»Г¤Г ГІГј Г«ГЁГ¶ГҐГ­Г§ГЁГѕ') then
+        if imgui.Button(u8'Выдать лицензию') then
             if playerID.v == '' then
-                sampAddChatMessage(tag .. "Г‚Г» Г­ГҐ ГіГЄГ Г§Г Г«ГЁ playerID !", 0xFFFF00)
+                sampAddChatMessage(tag .. "Вы не указали playerID !", 0xFFFF00)
             else 
                 licgive(playerID.v)
             end
         end
-        if imgui.Button(u8'Г‚Г»Г¤Г ГІГј Г«ГЁГ¶ГҐГ­Г§ГЁГѕ (nonRP)') then
+        if imgui.Button(u8'Выдать лицензию (nonRP)') then
             sampSendChat('/givelicense '.. playerID.v)
         end
-        if imgui.Button(u8'ГЏГ®Г¦ГҐГ«Г ГІГј ГµГ®Г°Г®ГёГҐГЈГ® Г¤Г­Гї') then
+        if imgui.Button(u8'Пожелать хорошего дня') then
             if inprocess == false then
-                sampSendChat('/todo Г“Г¤Г Г·Г­Г®ГЈГ® ГўГ Г¬ Г¤Г­Гї*ГіГ«Г»ГЎГ­ГіГўГёГЁГ±Гј ГЇГ®Г±ГҐГІГЁГІГҐГ«Гѕ')
+                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
             else
-                sampAddChatMessage(tag .. "Г‚Г» ГіГ¦ГҐ Г·ГІГ®ГІГ® ГўГ»ГЇГ®Г«Г­ГїГҐГІГҐ, ГЇГ®Г¤Г®Г¦Г¤ГЁГІГҐ!", 0xFFFF00)
+                sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
             end
 
         end
-        imgui.Checkbox(u8'ГЏГЁГ±Г ГІГј ГЇГ°ГЁ ГіГ±ГЇГҐГёГ­Г®Г© ГЇГ®ГЄГіГЇГЄГЁ Гў Г·Г ГІ ГЇГ®Г¦ГҐГ«Г Г­ГЁГҐ', checkbox1)
-        imgui.Checkbox(u8'ГЂГўГІГ®Г«ГЁГ¶ГҐГ­Г§ГЁГї (BETA)', checkbox3)
+        imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
+        imgui.Checkbox(u8'Автолицензия (BETA)', checkbox3)
         if checkbox3.v then
-            if imgui.Combo(u8'Г‚Г»ГЎГҐГ°ГЁГІГҐ Г«ГЁГ¶ГҐГ­Г§ГЁГѕ', selected_item, arr_lic, 2) then
+            if imgui.Combo(u8'Выберите лицензию', selected_item, arr_lic, 2) then
                 print(selected_item.v)
             end
         end
@@ -114,41 +115,41 @@ function imgui.OnDrawFrame()
         imgui.ShowCursor = true
         imgui.SetNextWindowSize(imgui.ImVec2(200, 320), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || ГЏГ°Г®Г·ГҐГҐ', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'ГЏГ® Г°Г ГЎГ®ГІГҐ:')
-        imgui.InputText(u8'ГЏГ°ГЁГ·ГЁГ­Г ', playerExpel)
-        if imgui.Button(u8'Г‚Г»ГЈГ­Г ГІГј ГЁГ§ Г ГўГІГ®ГёГЄГ®Г«Г»') then
+        imgui.Begin(u8'AutoSchool Helper || Прочее', nil, imgui.WindowFlags.NoCollapse)
+        imgui.Text(u8'По работе:')
+        imgui.InputText(u8'Причина', playerExpel)
+        if imgui.Button(u8'Выгнать из автошколы') then
             if  playerID.v == '' or playerExpel.v == '' then
-                sampAddChatMessage(tag .. "Г‚Г» Г­ГҐ ГіГЄГ Г§Г Г«ГЁ ГЇГ°ГЁГ·ГЁГ­Гі Г«ГЁГЎГ® playerID !", 0xFFFF00)
+                sampAddChatMessage(tag .. "Вы не указали причину либо playerID !", 0xFFFF00)
                 print(1)
             else
                 print(0)
                 sampSendChat('/expel '.. playerID.v .. ' ' .. u8:decode(playerExpel.v))
             end
         end
-        if imgui.Button(u8'ГђГ ГЎГ®Г·ГҐГҐ ГЇГ®Г°ГІГґГ®Г«ГЁГ®') then
+        if imgui.Button(u8'Рабочее портфолио') then
             sampSendChat('/jobprogress')
         end
-        if imgui.Button(u8'Г‘ГЇГЁГ±Г®ГЄ ГўГ® ГґГ°Г ГЄГ¶ГЁГЁ(online)') then
+        if imgui.Button(u8'Список во фракции(online)') then
             sampSendChat('/members')
         end
-        if imgui.Button(u8'ГЏГ®Г±Г¬Г®ГІГ°ГҐГІГј ГўГ°ГҐГ¬Гї') then
+        if imgui.Button(u8'Посмотреть время') then
             sampSendChat('/time')
         end
-        imgui.Text(u8'Г„Г°ГіГЈГ®ГҐ:')
-        if imgui.Button(u8'ГЊГҐГ­Гѕ') then
+        imgui.Text(u8'Другое:')
+        if imgui.Button(u8'Меню') then
             sampSendChat('/mm')
         end
-        if imgui.Button(u8'ГЌГ Г±ГІГ°Г®Г©ГЄГЁ') then
+        if imgui.Button(u8'Настройки') then
             sampSendChat('/settings')
         end
-        if imgui.Button(u8'ГЏГ®Г¬Г®Г№Гј') then
+        if imgui.Button(u8'Помощь') then
             sampSendChat('/help')
         end
-        if imgui.Button(u8'ГЌГ ГўГЁГЈГ ГІГ®Г°') then
+        if imgui.Button(u8'Навигатор') then
             sampSendChat('/gps')
         end
-        if imgui.Button(u8'Г€Г­ГўГҐГ­ГІГ Г°Гј') then
+        if imgui.Button(u8'Инвентарь') then
             sampSendChat('/invent')
         end
         imgui.End()
@@ -162,7 +163,7 @@ function main()
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             updateIni = inicfg.load(nil, update_path)
             if tonumber(updateIni.info.vers) > script_vers then
-                sampAddChatMessage(tag .. "Г…Г±ГІГј Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ! Г‚ГҐГ°Г±ГЁГї: " .. updateIni.info.vers_text, 0xFFFF00)
+                sampAddChatMessage(tag .. "Есть обновление! Версия: " .. updateIni.info.vers_text, 0xFFFF00)
                 update_state = true
             end
             os.remove(update_path)
@@ -173,7 +174,7 @@ function main()
         if update_state then
             downloadUrlToFile(script_url, script_path, function(id, status)
                 if status == dlstatus.STATUS_ENDDOWNLOADDATA then
-                    sampAddChatMessage(tag .. "Г‘ГЄГ°ГЁГЇГІ ГіГ±ГЇГҐГёГ­Г® Г®ГЎГ­Г®ГўГ«ГҐГ­! ГЏГҐГ°ГҐГ§Г ГЇГіГ±ГЄГ Гѕ...")
+                    sampAddChatMessage("Скрипт успешно обновлен! Перезапускаю...")
                     thisScript():reload()
                 end
             end)
@@ -198,90 +199,90 @@ function privet()
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГїГѕ...", 0xFFFF00)
-            sampSendChat('ГЏГ°ГЁГўГҐГІГ±ГІГўГіГѕ, Гї "' .. config.settings.rank .. '" Г¤Г Г­Г­Г®ГЈГ® Г«ГЁГ¶ГҐГ­Г§ГЁГ°Г®ГўГ Г­Г­Г®ГЈГ® Г¶ГҐГ­ГІГ°Г , Г·ГҐГ¬ Г¬Г®ГЈГі ГўГ Г¬ ГЇГ®Г¬Г®Г·Гј?')
+            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
+            sampSendChat('Приветствую, я "' .. config.settings.rank .. '" данного лицензированного центра, чем могу вам помочь?')
             wait(1500)
-            sampSendChat('/do ГЌГ  ГЈГ°ГіГ¤ГЁ ГўГҐГ±ГЁГІ ГЎГҐГ©Г¤Г¦ГЁГЄ Г± Г­Г Г¤ГЇГЁГ±ГјГѕ "' .. config.settings.rank .. ' - '.. config.settings.name .. '.')
+            sampSendChat('/do На груди весит бейджик с надписью "' .. config.settings.rank .. ' - '.. config.settings.name .. '.')
             wait(500)
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГҐГ­Г®!", 0xFFFF00)
+            sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Г‚Г» ГіГ¦ГҐ Г·ГІГ®ГІГ® ГўГ»ГЇГ®Г«Г­ГїГҐГІГҐ, ГЇГ®Г¤Г®Г¦Г¤ГЁГІГҐ!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function pilot()
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГїГѕ...", 0xFFFF00)
-            sampSendChat('ГЏГ®Г«ГіГ·ГЁГІГј Г«ГЁГ¶ГҐГ­Г§ГЁГѕ Г­Г  ГЇГ®Г«ВёГІГ» Г‚Г» Г¬Г®Г¦ГҐГІГҐ Гў Г ГўГЁГ ГёГЄГ®Г«ГҐ ГЈ. Г‹Г Г±-Г‚ГҐГ­ГІГіГ°Г Г±')
+            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
+            sampSendChat('Получить лицензию на полёты Вы можете в авиашколе г. Лас-Вентурас')
             wait(1500)
-            sampSendChat('/n /gps -> Г‚Г Г¦Г­Г»ГҐ Г¬ГҐГ±ГІГ  -> Г‘Г«ГҐГ¤ГіГѕГ№Г Гї Г±ГІГ°Г Г­ГЁГ¶Г  -> [LV] ГЂГўГЁГ ГёГЄГ®Г«Г  (9)')
+            sampSendChat('/n /gps -> Важные места -> Следующая страница -> [LV] Авиашкола (9)')
             wait(500)
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГҐГ­Г®!", 0xFFFF00)
+            sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Г‚Г» ГіГ¦ГҐ Г·ГІГ®ГІГ® ГўГ»ГЇГ®Г«Г­ГїГҐГІГҐ, ГЇГ®Г¤Г®Г¦Г¤ГЁГІГҐ!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function med(myid)
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГїГѕ...", 0xFFFF00)
-            sampSendChat('Г„Г«Гї ГЇГ®Г«ГіГ·ГҐГ­ГЁГї Г«ГЁГ¶ГҐГ­Г§ГЁГЁ Г­Г  Г®Г°ГіГ¦ГЁГҐ ГЇГ®ГЄГ Г¦ГЁГІГҐ ГўГ ГёГі Г¬ГҐГ¤.ГЄГ Г°ГІГі ')
+            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
+            sampSendChat('Для получения лицензии на оружие покажите вашу мед.карту ')
             wait(1000)
             sampSendChat('/b /showmc ' .. myid)
             wait(500)
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГҐГ­Г®! Г“ГЎГҐГ¤ГЁГІГҐГ±Гј Г·ГІГ® Гў ГЊГҐГ¤. ГЄГ Г°ГІГҐ Г­Г ГЇГЁГ±Г Г­Г® 'ГЏГ®Г«Г­Г®Г±ГІГјГѕ Г§Г¤Г®Г°Г®ГўГ»Г©(Г Гї)'", 0xFFFF00)
+            sampAddChatMessage(tag .. "Выполнено! Убедитесь что в Мед. карте написано 'Полностью здоровый(ая)'", 0xFFFF00)
             inprocess = not inprocess
             wait(500)
             if checkbox3.v then
                 selected_item.v = 4
-                sampAddChatMessage(tag .. "ГЂГўГІГ®Г«ГЁГ¶ГҐГ­Г§ГЁГї ГўГ»ГЎГ°Г Г­Г : ГЋГ°ГіГ¦ГЁГҐ'", 0xFFFF00)
+                sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
             end
         end)
     else
-        sampAddChatMessage(tag .. "Г‚Г» ГіГ¦ГҐ Г·ГІГ®ГІГ® ГўГ»ГЇГ®Г«Г­ГїГҐГІГҐ, ГЇГ®Г¤Г®Г¦Г¤ГЁГІГҐ!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function licgive(id)
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГїГѕ...", 0xFFFF00)
-            sampSendChat('Г‘ГҐГЄГіГ­Г¤Гі...')
+            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
+            sampSendChat('Секунду...')
             wait(1500)
-            sampSendChat('/do ГЌГ  Г±ГІГ®Г«ГҐ Г«ГҐГ¦ГЁГІ ГЇГҐГ·Г ГІГј ГЁ Г«ГЁГ¶ГҐГ­Г§ГЁГї Г± ГЎГ«Г Г­ГЄГ®Г¬.')
+            sampSendChat('/do На столе лежит печать и лицензия с бланком.')
             wait(1500)
-            sampSendChat('/me ГЎГҐГ°ГҐГІ Г±Г® Г±ГІГ®Г«Г  ГЎГ«Г Г­ГЄ ГЁ Г¤Г®Г±ГІГ ГҐГІ ГЁГ§ ГЄГ Г°Г¬Г Г­Г  Г°ГіГЎГ ГёГЄГЁ Г°ГіГ·ГЄГі')
+            sampSendChat('/me берет со стола бланк и достает из кармана рубашки ручку')
             wait(1500)
-            sampSendChat('/me Г§Г ГЇГ®Г«Г­ГїГҐГІ ГЎГ«Г Г­ГЄ Г­Г  ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ Г«ГЁГ¶ГҐГ­Г§ГЁГЁ')
+            sampSendChat('/me заполняет бланк на получение лицензии')
             wait(1500)
-            sampSendChat('/me Г­Г Г·ГЁГ­Г ГҐГІ Г§Г ГЇГ®Г«Г­ГїГІГј Г«ГЁГ¶ГҐГ­Г§ГЁГѕ')
+            sampSendChat('/me начинает заполнять лицензию')
             wait(1500)
-            sampSendChat('/do Г‹ГЁГ¶ГҐГ­Г§ГЁГї Г§Г ГЇГ®Г«Г­ГҐГ­Г .')
+            sampSendChat('/do Лицензия заполнена.')
             wait(1500)
-            sampSendChat('/me ГўГ§ГїГ« ГЇГҐГ·Г ГІГј Гў Г°ГіГЄГЁ ГЁ ГЇГ®Г±ГІГ ГўГЁГ« Г®ГІГІГҐГ±ГЄ Г± Г­Г Г§ГўГ Г­ГЁГҐГ¬ "ГѓГ–Г‹"')
+            sampSendChat('/me взял печать в руки и поставил оттеск с названием "ГЦЛ"')
             wait(1500)
             sampSendChat('/givelicense '.. id)
             wait(500)
-            sampAddChatMessage(tag .. "Г‚Г»ГЇГ®Г«Г­ГҐГ­Г®! Г‚Г»ГЎГҐГ°ГЁГІГҐ Г­ГіГ¦Г­ГіГѕ Г«ГЁГ¶ГҐГ­Г§ГЁГѕ:", 0xFFFF00)
+            sampAddChatMessage(tag .. "Выполнено! Выберите нужную лицензию:", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Г‚Г» ГіГ¦ГҐ Г·ГІГ®ГІГ® ГўГ»ГЇГ®Г«Г­ГїГҐГІГҐ, ГЇГ®Г¤Г®Г¦Г¤ГЁГІГҐ!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function se.onServerMessage(color, text)
-    if text:find('%[Г€Г­ГґГ®Г°Г¬Г Г¶ГЁГї%]%s+%{%w+%}Г‚Г» ГіГ±ГЇГҐГёГ­Г® ГЇГ°Г®Г¤Г Г«ГЁ Г«ГЁГ¶ГҐГ­Г§ГЁГѕ') then
+    if text:find('%[Информация%]%s+%{%w+%}Вы успешно продали лицензию') then
         if checkbox1.v then
             lua_thread.create(function()
-                sampSendChat('/todo Г“Г¤Г Г·Г­Г®ГЈГ® ГўГ Г¬ Г¤Г­Гї*ГіГ«Г»ГЎГ­ГіГўГёГЁГ±Гј ГЇГ®Г±ГҐГІГЁГІГҐГ«Гѕ')
+                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
                 wait(500)
-                sampAddChatMessage(tag .. "ГЉГ«ГЁГҐГ­ГІ ГЄГіГЇГЁГ« Г«ГЁГ¶ГҐГ­Г§ГЁГѕ, Г¤ГҐГ­ГјГЈГЁ Г­Г Г·ГЁГ±Г«ГҐГ­Г».", 0xFFFF00)
+                sampAddChatMessage(tag .. "Клиент купил лицензию, деньги начислены.", 0xFFFF00)
             end)
         end
     end
@@ -292,7 +293,7 @@ end
 --     end
 -- end
 -- function se.onShowDialog(dialogId, style, title, button1, button2, text)
---     if title:find("%Г‚Г»ГЎГҐГ°ГЁГІГҐ Г«ГЁГ¶ГҐГ­Г§ГЁГѕ") then
+--     if title:find("%Выберите лицензию") then
 --         if dialogId == 6 then
 --             lua_thread.create(function()
 --                 wait(500)
