@@ -49,7 +49,7 @@ local ex, ey = getScreenResolution()
 function imgui.OnDrawFrame()
     local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
     if main_window_state.v then
-        imgui.SetNextWindowSize(imgui.ImVec2(580, 240), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(580, 220), imgui.Cond.FirstUseEver)
         imgui.Begin('AutoSchool helper', main_window_state)
         imgui.InputText(u8'ID Игрока для манипуляций', playerID)
         imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
@@ -71,7 +71,7 @@ function imgui.OnDrawFrame()
     end
     if lic_menu.v then
         imgui.ShowCursor = true
-        imgui.SetNextWindowSize(imgui.ImVec2(430, 230), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(430, 275), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'AutoSchool Helper || Продажа лицензий', nil, imgui.WindowFlags.NoCollapse)
         imgui.Text(u8'При продаже лицензии на оружие нужно проверить мед. карту!')
@@ -105,7 +105,7 @@ function imgui.OnDrawFrame()
         imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
         imgui.Checkbox(u8'Автолицензия (BETA)', checkbox3)
         if checkbox3.v then
-            if imgui.Combo(u8'Выберите лицензию', selected_item, arr_lic, 2) then
+            if imgui.Combo(u8'Выберите лицензию', selected_item, arr_lic, 7) then
                 print(selected_item.v)
             end
         end
