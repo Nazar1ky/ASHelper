@@ -25,7 +25,7 @@ local inprocess = false
 local gender = 0
 
 -- if not _ then
---         sampAddChatMessage("Библиотека imgui не найдена... Установим!", -1)
+--         sampAddChatMessage("Р‘РёР±Р»РёРѕС‚РµРєР° imgui РЅРµ РЅР°Р№РґРµРЅР°... РЈСЃС‚Р°РЅРѕРІРёРј!", -1)
 --         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/imgui.lua', 'moonloader/lib/imgui.lua')
 --         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/MoonImGui.dll', 'moonloader/lib/MoonImGui.dll')
 --         thisScript():reload()
@@ -42,7 +42,7 @@ local isp_menu = imgui.ImBool(false)
 local lic_menu = imgui.ImBool(false)
 local other_menu = imgui.ImBool(false)
 local anim_cheat = imgui.ImBool(false)
-local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
+local arr_lic = {u8"РњР°С€РёРЅР°", u8"РњРѕС‚РѕС†РёРєР»С‹", u8"Р С‹Р±Р°Р»РєР°", u8"Р›РѕРґРєРё", u8"РћСЂСѓР¶РёРµ", u8"Р Р°СЃРєРѕРїРєРё", u8"РўР°РєСЃРё"}
 local selected_item = imgui.ImInt(0)
 
 local ex, ey = getScreenResolution()
@@ -51,13 +51,13 @@ function imgui.OnDrawFrame()
     if main_window_state.v then
         imgui.SetNextWindowSize(imgui.ImVec2(580, 200), imgui.Cond.FirstUseEver)
         imgui.Begin('AutoSchool helper', main_window_state)
-        imgui.InputText(u8'ID Игрока для манипуляций', playerID)
-        imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
+        imgui.InputText(u8'ID РРіСЂРѕРєР° РґР»СЏ РјР°РЅРёРїСѓР»СЏС†РёР№', playerID)
+        imgui.Checkbox(u8'РџСЂРё РЅР°С†РµР»РёРІР°РЅРёРµ playerID Р·Р°РїРѕР»РЅСЏРµС‚СЊСЃСЏ Р°Р№РґРё РІ С‚РѕРіРѕ РєРѕРіРѕ С†РµР»РёС‚РµСЃСЊ', checkbox2)
         imgui.Checkbox(u8'PRICE LIST', isp_menu)
-        imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
-        imgui.Checkbox(u8'Прочее', other_menu)
-        imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
-        imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
+        imgui.Checkbox(u8'РџСЂРѕРґР°Р¶Р° Р›РёС†РµРЅР·РёР№', lic_menu)
+        imgui.Checkbox(u8'РџСЂРѕС‡РµРµ', other_menu)
+        imgui.Checkbox(u8'РЎР±РёРІ Р°РЅРёРјРєРё РґСѓР±РёРЅРєРё (Р§РРў)', anim_cheat)
+        imgui.Text(u8(string.format('РўРµРєСѓС‰Р°СЏ РґР°С‚Р°: %s', os.date())))
         imgui.End()
     end
     if isp_menu.v then
@@ -65,46 +65,46 @@ function imgui.OnDrawFrame()
         imgui.SetNextWindowSize(imgui.ImVec2(300, 170), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
         imgui.Begin(u8'AutoSchool Helper || PRICE LIST', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'PRICE LIST:\nНа авто: 10.000\nНа мото: 12.000\nНа рыбалку: 21.000\nВодный транспорт: 20.000\nОружие: 50.000(Требуеться Мед. карта\nОхота: 100.000\nНа распопки: 200.000\nНа полеты 20.000 (Сдавать в авиашколе)')
+        imgui.Text(u8'PRICE LIST:\nРќР° Р°РІС‚Рѕ: 10.000\nРќР° РјРѕС‚Рѕ: 12.000\nРќР° СЂС‹Р±Р°Р»РєСѓ: 21.000\nР’РѕРґРЅС‹Р№ С‚СЂР°РЅСЃРїРѕСЂС‚: 20.000\nРћСЂСѓР¶РёРµ: 50.000(РўСЂРµР±СѓРµС‚СЊСЃСЏ РњРµРґ. РєР°СЂС‚Р°\nРћС…РѕС‚Р°: 100.000\nРќР° СЂР°СЃРїРѕРїРєРё: 200.000\nРќР° РїРѕР»РµС‚С‹ 20.000 (РЎРґР°РІР°С‚СЊ РІ Р°РІРёР°С€РєРѕР»Рµ)')
         imgui.End()
     end
     if lic_menu.v then
         imgui.ShowCursor = true
         imgui.SetNextWindowSize(imgui.ImVec2(430, 230), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || Продажа лицензий', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'При продаже лицензии на оружие нужно проверить мед. карту!')
-        if imgui.Button(u8'Приставиться') then
+        imgui.Begin(u8'AutoSchool Helper || РџСЂРѕРґР°Р¶Р° Р»РёС†РµРЅР·РёР№', nil, imgui.WindowFlags.NoCollapse)
+        imgui.Text(u8'РџСЂРё РїСЂРѕРґР°Р¶Рµ Р»РёС†РµРЅР·РёРё РЅР° РѕСЂСѓР¶РёРµ РЅСѓР¶РЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ РјРµРґ. РєР°СЂС‚Сѓ!')
+        if imgui.Button(u8'РџСЂРёСЃС‚Р°РІРёС‚СЊСЃСЏ') then
             privet()
         end
-        if imgui.Button(u8'Лицензия на пилота') then
+        if imgui.Button(u8'Р›РёС†РµРЅР·РёСЏ РЅР° РїРёР»РѕС‚Р°') then
             pilot()
         end
-        if imgui.Button(u8'Проверить мед. карту') then
+        if imgui.Button(u8'РџСЂРѕРІРµСЂРёС‚СЊ РјРµРґ. РєР°СЂС‚Сѓ') then
                 med(myid)
         end
-        if imgui.Button(u8'Выдать лицензию') then
+        if imgui.Button(u8'Р’С‹РґР°С‚СЊ Р»РёС†РµРЅР·РёСЋ') then
             if playerID.v == '' then
-                sampAddChatMessage(tag .. "Вы не указали playerID !", 0xFFFF00)
+                sampAddChatMessage(tag .. "Р’С‹ РЅРµ СѓРєР°Р·Р°Р»Рё playerID !", 0xFFFF00)
             else 
                 licgive(playerID.v)
             end
         end
-        if imgui.Button(u8'Выдать лицензию (nonRP)') then
+        if imgui.Button(u8'Р’С‹РґР°С‚СЊ Р»РёС†РµРЅР·РёСЋ (nonRP)') then
             sampSendChat('/givelicense '.. playerID.v)
         end
-        if imgui.Button(u8'Пожелать хорошего дня') then
+        if imgui.Button(u8'РџРѕР¶РµР»Р°С‚СЊ С…РѕСЂРѕС€РµРіРѕ РґРЅСЏ') then
             if inprocess == false then
-                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
+                sampSendChat('/todo РЈРґР°С‡РЅРѕРіРѕ РІР°Рј РґРЅСЏ*СѓР»С‹Р±РЅСѓРІС€РёСЃСЊ РїРѕСЃРµС‚РёС‚РµР»СЋ')
             else
-                sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+                sampAddChatMessage(tag .. "Р’С‹ СѓР¶Рµ С‡С‚РѕС‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚Рµ, РїРѕРґРѕР¶РґРёС‚Рµ!", 0xFFFF00)
             end
 
         end
-        imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
-        imgui.Checkbox(u8'Автолицензия (BETA)', checkbox3)
+        imgui.Checkbox(u8'РџРёСЃР°С‚СЊ РїСЂРё СѓСЃРїРµС€РЅРѕР№ РїРѕРєСѓРїРєРё РІ С‡Р°С‚ РїРѕР¶РµР»Р°РЅРёРµ', checkbox1)
+        imgui.Checkbox(u8'РђРІС‚РѕР»РёС†РµРЅР·РёСЏ (BETA)', checkbox3)
         if checkbox3.v then
-            if imgui.Combo(u8'Выберите лицензию', selected_item, arr_lic, 2) then
+            if imgui.Combo(u8'Р’С‹Р±РµСЂРёС‚Рµ Р»РёС†РµРЅР·РёСЋ', selected_item, arr_lic, 2) then
                 print(selected_item.v)
             end
         end
@@ -114,41 +114,41 @@ function imgui.OnDrawFrame()
         imgui.ShowCursor = true
         imgui.SetNextWindowSize(imgui.ImVec2(200, 320), imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || Прочее', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'По работе:')
-        imgui.InputText(u8'Причина', playerExpel)
-        if imgui.Button(u8'Выгнать из автошколы') then
+        imgui.Begin(u8'AutoSchool Helper || РџСЂРѕС‡РµРµ', nil, imgui.WindowFlags.NoCollapse)
+        imgui.Text(u8'РџРѕ СЂР°Р±РѕС‚Рµ:')
+        imgui.InputText(u8'РџСЂРёС‡РёРЅР°', playerExpel)
+        if imgui.Button(u8'Р’С‹РіРЅР°С‚СЊ РёР· Р°РІС‚РѕС€РєРѕР»С‹') then
             if  playerID.v == '' or playerExpel.v == '' then
-                sampAddChatMessage(tag .. "Вы не указали причину либо playerID !", 0xFFFF00)
+                sampAddChatMessage(tag .. "Р’С‹ РЅРµ СѓРєР°Р·Р°Р»Рё РїСЂРёС‡РёРЅСѓ Р»РёР±Рѕ playerID !", 0xFFFF00)
                 print(1)
             else
                 print(0)
                 sampSendChat('/expel '.. playerID.v .. ' ' .. u8:decode(playerExpel.v))
             end
         end
-        if imgui.Button(u8'Рабочее портфолио') then
+        if imgui.Button(u8'Р Р°Р±РѕС‡РµРµ РїРѕСЂС‚С„РѕР»РёРѕ') then
             sampSendChat('/jobprogress')
         end
-        if imgui.Button(u8'Список во фракции(online)') then
+        if imgui.Button(u8'РЎРїРёСЃРѕРє РІРѕ С„СЂР°РєС†РёРё(online)') then
             sampSendChat('/members')
         end
-        if imgui.Button(u8'Посмотреть время') then
+        if imgui.Button(u8'РџРѕСЃРјРѕС‚СЂРµС‚СЊ РІСЂРµРјСЏ') then
             sampSendChat('/time')
         end
-        imgui.Text(u8'Другое:')
-        if imgui.Button(u8'Меню') then
+        imgui.Text(u8'Р”СЂСѓРіРѕРµ:')
+        if imgui.Button(u8'РњРµРЅСЋ') then
             sampSendChat('/mm')
         end
-        if imgui.Button(u8'Настройки') then
+        if imgui.Button(u8'РќР°СЃС‚СЂРѕР№РєРё') then
             sampSendChat('/settings')
         end
-        if imgui.Button(u8'Помощь') then
+        if imgui.Button(u8'РџРѕРјРѕС‰СЊ') then
             sampSendChat('/help')
         end
-        if imgui.Button(u8'Навигатор') then
+        if imgui.Button(u8'РќР°РІРёРіР°С‚РѕСЂ') then
             sampSendChat('/gps')
         end
-        if imgui.Button(u8'Инвентарь') then
+        if imgui.Button(u8'РРЅРІРµРЅС‚Р°СЂСЊ') then
             sampSendChat('/invent')
         end
         imgui.End()
@@ -162,7 +162,7 @@ function main()
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             updateIni = inicfg.load(nil, update_path)
             tonumber(updateIni.info.vers) > script_vers then
-                sampAddChatMessage(tag .. "Есть обновление! Версия: " .. updateIni.info.vers_text, 0xFFFF00)
+                sampAddChatMessage(tag .. "Р•СЃС‚СЊ РѕР±РЅРѕРІР»РµРЅРёРµ! Р’РµСЂСЃРёСЏ: " .. updateIni.info.vers_text, 0xFFFF00)
                 update_state = true
             end
             os.remove(update_path)
@@ -199,90 +199,90 @@ function privet()
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Приветствую, я "' .. config.settings.rank .. '" данного лицензированного центра, чем могу вам помочь?')
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅСЏСЋ...", 0xFFFF00)
+            sampSendChat('РџСЂРёРІРµС‚СЃС‚РІСѓСЋ, СЏ "' .. config.settings.rank .. '" РґР°РЅРЅРѕРіРѕ Р»РёС†РµРЅР·РёСЂРѕРІР°РЅРЅРѕРіРѕ С†РµРЅС‚СЂР°, С‡РµРј РјРѕРіСѓ РІР°Рј РїРѕРјРѕС‡СЊ?')
             wait(1500)
-            sampSendChat('/do На груди весит бейджик с надписью "' .. config.settings.rank .. ' - '.. config.settings.name .. '.')
+            sampSendChat('/do РќР° РіСЂСѓРґРё РІРµСЃРёС‚ Р±РµР№РґР¶РёРє СЃ РЅР°РґРїРёСЃСЊСЋ "' .. config.settings.rank .. ' - '.. config.settings.name .. '.')
             wait(500)
-            sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅРµРЅРѕ!", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Р’С‹ СѓР¶Рµ С‡С‚РѕС‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚Рµ, РїРѕРґРѕР¶РґРёС‚Рµ!", 0xFFFF00)
     end
 end
 function pilot()
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Получить лицензию на полёты Вы можете в авиашколе г. Лас-Вентурас')
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅСЏСЋ...", 0xFFFF00)
+            sampSendChat('РџРѕР»СѓС‡РёС‚СЊ Р»РёС†РµРЅР·РёСЋ РЅР° РїРѕР»С‘С‚С‹ Р’С‹ РјРѕР¶РµС‚Рµ РІ Р°РІРёР°С€РєРѕР»Рµ Рі. Р›Р°СЃ-Р’РµРЅС‚СѓСЂР°СЃ')
             wait(1500)
-            sampSendChat('/n /gps -> Важные места -> Следующая страница -> [LV] Авиашкола (9)')
+            sampSendChat('/n /gps -> Р’Р°Р¶РЅС‹Рµ РјРµСЃС‚Р° -> РЎР»РµРґСѓСЋС‰Р°СЏ СЃС‚СЂР°РЅРёС†Р° -> [LV] РђРІРёР°С€РєРѕР»Р° (9)')
             wait(500)
-            sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅРµРЅРѕ!", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Р’С‹ СѓР¶Рµ С‡С‚РѕС‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚Рµ, РїРѕРґРѕР¶РґРёС‚Рµ!", 0xFFFF00)
     end
 end
 function med(myid)
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Для получения лицензии на оружие покажите вашу мед.карту ')
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅСЏСЋ...", 0xFFFF00)
+            sampSendChat('Р”Р»СЏ РїРѕР»СѓС‡РµРЅРёСЏ Р»РёС†РµРЅР·РёРё РЅР° РѕСЂСѓР¶РёРµ РїРѕРєР°Р¶РёС‚Рµ РІР°С€Сѓ РјРµРґ.РєР°СЂС‚Сѓ ')
             wait(1000)
             sampSendChat('/b /showmc ' .. myid)
             wait(500)
-            sampAddChatMessage(tag .. "Выполнено! Убедитесь что в Мед. карте написано 'Полностью здоровый(ая)'", 0xFFFF00)
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅРµРЅРѕ! РЈР±РµРґРёС‚РµСЃСЊ С‡С‚Рѕ РІ РњРµРґ. РєР°СЂС‚Рµ РЅР°РїРёСЃР°РЅРѕ 'РџРѕР»РЅРѕСЃС‚СЊСЋ Р·РґРѕСЂРѕРІС‹Р№(Р°СЏ)'", 0xFFFF00)
             inprocess = not inprocess
             wait(500)
             if checkbox3.v then
                 selected_item.v = 4
-                sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
+                sampAddChatMessage(tag .. "РђРІС‚РѕР»РёС†РµРЅР·РёСЏ РІС‹Р±СЂР°РЅР°: РћСЂСѓР¶РёРµ'", 0xFFFF00)
             end
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Р’С‹ СѓР¶Рµ С‡С‚РѕС‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚Рµ, РїРѕРґРѕР¶РґРёС‚Рµ!", 0xFFFF00)
     end
 end
 function licgive(id)
     if inprocess == false then
         lua_thread.create(function()
             inprocess = not inprocess
-            sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Секунду...')
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅСЏСЋ...", 0xFFFF00)
+            sampSendChat('РЎРµРєСѓРЅРґСѓ...')
             wait(1500)
-            sampSendChat('/do На столе лежит печать и лицензия с бланком.')
+            sampSendChat('/do РќР° СЃС‚РѕР»Рµ Р»РµР¶РёС‚ РїРµС‡Р°С‚СЊ Рё Р»РёС†РµРЅР·РёСЏ СЃ Р±Р»Р°РЅРєРѕРј.')
             wait(1500)
-            sampSendChat('/me берет со стола бланк и достает из кармана рубашки ручку')
+            sampSendChat('/me Р±РµСЂРµС‚ СЃРѕ СЃС‚РѕР»Р° Р±Р»Р°РЅРє Рё РґРѕСЃС‚Р°РµС‚ РёР· РєР°СЂРјР°РЅР° СЂСѓР±Р°С€РєРё СЂСѓС‡РєСѓ')
             wait(1500)
-            sampSendChat('/me заполняет бланк на получение лицензии')
+            sampSendChat('/me Р·Р°РїРѕР»РЅСЏРµС‚ Р±Р»Р°РЅРє РЅР° РїРѕР»СѓС‡РµРЅРёРµ Р»РёС†РµРЅР·РёРё')
             wait(1500)
-            sampSendChat('/me начинает заполнять лицензию')
+            sampSendChat('/me РЅР°С‡РёРЅР°РµС‚ Р·Р°РїРѕР»РЅСЏС‚СЊ Р»РёС†РµРЅР·РёСЋ')
             wait(1500)
-            sampSendChat('/do Лицензия заполнена.')
+            sampSendChat('/do Р›РёС†РµРЅР·РёСЏ Р·Р°РїРѕР»РЅРµРЅР°.')
             wait(1500)
-            sampSendChat('/me взял печать в руки и поставил оттеск с названием "ГЦЛ"')
+            sampSendChat('/me РІР·СЏР» РїРµС‡Р°С‚СЊ РІ СЂСѓРєРё Рё РїРѕСЃС‚Р°РІРёР» РѕС‚С‚РµСЃРє СЃ РЅР°Р·РІР°РЅРёРµРј "Р“Р¦Р›"')
             wait(1500)
             sampSendChat('/givelicense '.. id)
             wait(500)
-            sampAddChatMessage(tag .. "Выполнено! Выберите нужную лицензию:", 0xFFFF00)
+            sampAddChatMessage(tag .. "Р’С‹РїРѕР»РЅРµРЅРѕ! Р’С‹Р±РµСЂРёС‚Рµ РЅСѓР¶РЅСѓСЋ Р»РёС†РµРЅР·РёСЋ:", 0xFFFF00)
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(tag .. "Р’С‹ СѓР¶Рµ С‡С‚РѕС‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚Рµ, РїРѕРґРѕР¶РґРёС‚Рµ!", 0xFFFF00)
     end
 end
 function se.onServerMessage(color, text)
-    if text:find('%[Информация%]%s+%{%w+%}Вы успешно продали лицензию') then
+    if text:find('%[РРЅС„РѕСЂРјР°С†РёСЏ%]%s+%{%w+%}Р’С‹ СѓСЃРїРµС€РЅРѕ РїСЂРѕРґР°Р»Рё Р»РёС†РµРЅР·РёСЋ') then
         if checkbox1.v then
             lua_thread.create(function()
-                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
+                sampSendChat('/todo РЈРґР°С‡РЅРѕРіРѕ РІР°Рј РґРЅСЏ*СѓР»С‹Р±РЅСѓРІС€РёСЃСЊ РїРѕСЃРµС‚РёС‚РµР»СЋ')
                 wait(500)
-                sampAddChatMessage(tag .. "Клиент купил лицензию, деньги начислены.", 0xFFFF00)
+                sampAddChatMessage(tag .. "РљР»РёРµРЅС‚ РєСѓРїРёР» Р»РёС†РµРЅР·РёСЋ, РґРµРЅСЊРіРё РЅР°С‡РёСЃР»РµРЅС‹.", 0xFFFF00)
             end)
         end
     end
@@ -293,7 +293,7 @@ end
 --     end
 -- end
 -- function se.onShowDialog(dialogId, style, title, button1, button2, text)
---     if title:find("%Выберите лицензию") then
+--     if title:find("%Р’С‹Р±РµСЂРёС‚Рµ Р»РёС†РµРЅР·РёСЋ") then
 --         if dialogId == 6 then
 --             lua_thread.create(function()
 --                 wait(500)
