@@ -22,7 +22,11 @@ encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local tag = "{62E200}[ASHelper]: {FFFFFF}"
 local inprocess = false
-local gender = 0
+
+
+local confige = config.settings
+local gender = confige.gender
+local keyr = confige.keyr
 
 -- if not _ then
 --         sampAddChatMessage("Библиотека imgui не найдена... Установим!", -1)
@@ -31,6 +35,8 @@ local gender = 0
 --         thisScript():reload()
 --         return false
 -- end
+
+
 local main_window_state = imgui.ImBool(false)
 local playerID = imgui.ImBuffer(256)
 local playerExpel = imgui.ImBuffer(256)
@@ -180,7 +186,7 @@ function main()
             end)
             break
         end
-            if wasKeyPressed(key.VK_X) then
+            if wasKeyPressed(keyr) then
                 main_window_state.v = not main_window_state.v
             end
             imgui.Process = main_window_state.v
@@ -200,9 +206,9 @@ function privet()
         lua_thread.create(function()
             inprocess = not inprocess
             sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Приветствую, я "' .. config.settings.rank .. '" данного лицензированного центра, чем могу вам помочь?')
+            sampSendChat('Приветствую, я "' .. confige.rank .. '" данного лицензированного центра, чем могу вам помочь?')
             wait(1500)
-            sampSendChat('/do На груди весит бейджик с надписью "' .. config.settings.rank .. ' - '.. config.settings.name .. '.')
+            sampSendChat('/do На груди весит бейджик с надписью "' .. confige.rank .. ' - '.. confige.name .. '.')
             wait(500)
             sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
             inprocess = not inprocess
