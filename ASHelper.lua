@@ -3,14 +3,14 @@ require "lib.moonloader"
 local dlstatus = require('moonloader').download_status
 local se = require 'samp.events'
 local config = require "config"
-local res_imgui, imgui = pcall(require, 'imgui')
+local imguicheck, imgui	= pcall(require, "imgui")
 local key = require 'vkeys'
 local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 4
-local script_vers_text = "1.2"
+local script_vers = 5
+local script_vers_text = "1.3"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -38,21 +38,23 @@ local keyr = confige.keyr
 -- end
 
 
-local main_window_state = imgui.ImBool(false)
-local playerID = imgui.ImBuffer(256)
-local playerExpel = imgui.ImBuffer(256)
-local licID = imgui.ImBuffer(256)
-local checkbox1 = imgui.ImBool(false)
-local checkbox2 = imgui.ImBool(false)
-local checkbox3 = imgui.ImBool(false)
-local checkbox4 = imgui.ImBool(false)
-local isp_menu = imgui.ImBool(false)
-local lic_menu = imgui.ImBool(false)
-local other_menu = imgui.ImBool(false)
-local settings_menu = imgui.ImBool(false)
-local anim_cheat = imgui.ImBool(false)
-local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
-local lictype = imgui.ImInt(0)
+
+    local main_window_state = imgui.ImBool(false)
+    local playerID = imgui.ImBuffer(256)
+    local playerExpel = imgui.ImBuffer(256)
+    local licID = imgui.ImBuffer(256)
+    local checkbox1 = imgui.ImBool(false)
+    local checkbox2 = imgui.ImBool(false)
+    local checkbox3 = imgui.ImBool(false)
+    local isp_menu = imgui.ImBool(false)
+    local lic_menu = imgui.ImBool(false)
+    local other_menu = imgui.ImBool(false)
+    local settings_menu = imgui.ImBool(false)
+
+    local settings_menu = imgui.ImBool(false)
+    local anim_cheat = imgui.ImBool(false)
+    local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
+    local lictype = imgui.ImInt(0)
 
 local ex, ey = getScreenResolution()
 function imgui.OnDrawFrame()
@@ -114,11 +116,10 @@ function imgui.OnDrawFrame()
 
         end
         imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
-        imgui.Checkbox(u8'Автопроверка мед. карты', checkbox4)
-        imgui.Checkbox(u8'Автолицензия (BETA)', checkbox3)
+        imgui.Checkbox(u8'Автосистема (BETA)', checkbox3)
         if checkbox3.v then
             if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 8) then
-                print(selected_item.v)
+                print(lictype.v)
             end
         end
             imgui.End()
@@ -199,14 +200,14 @@ function main()
         if update_state then
             downloadUrlToFile(script_url, script_path, function(id, status)
                 if status == dlstatus.STATUS_ENDDOWNLOADDATA then
-                    sampAddChatMessage("Скрипт успешно обновлен! Перезапускаю...")
+                    sampAddChatMessage(tag .. "Скрипт успешно обновлен! Перезапускаю...")
                     thisScript():reload()
                 end
             end)
             break
         end
             if wasKeyPressed(keyr) then
-                main_window_state.v = not main_window_state.v
+                    main_window_state.v = not main_window_state.v
             end
             imgui.Process = main_window_state.v
             local valid, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
@@ -271,7 +272,7 @@ function med(myid)
             inprocess = not inprocess
             wait(500)
             if checkbox3.v then
-                selected_item.v = 4
+                lictype.v = 4
                 sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
             end
         end)
@@ -291,6 +292,8 @@ function licgive(id)
             sampSendChat('/do Спустя некоторое время бланк на получение лицензии был заполнен.')
             wait(2000)
             sampSendChat('/me распечатав лицензию на оружие {gender:передал|передала} её человеку напротив')
+            wait(1700)
+            sampSendChat('/givelicense '.. playerID.v)
             inprocess = not inprocess
         end)
     else
@@ -318,14 +321,14 @@ end
 --     end
 -- end
 function se.onShowDialog(dialogId, style, title, button1, button2, text)
-    if checkbox3.v then
-        if dialogId == 6 then
-            sampSendDialogResponse(sampGetCurrentDialogId(), 1, selected_item.v, _)
+    if dialogId == 6 then
+        if checkbox3.v then
+            sampSendDialogResponse(sampGetCurrentDialogId(), 1, lictype.v, _)
             return false
         end
     end
     if dialogId == 1234 then
-        if checkbox4.v then
+        if checkbox3.v then
             if text:find("Имя: "..sampGetPlayerNickname(playerID.v)) then
                 if text:find("Полностью здоровый") then
                     lua_thread.create(function()
@@ -333,6 +336,7 @@ function se.onShowDialog(dialogId, style, title, button1, button2, text)
                             wait(0)
                         end
                         inprocess = true
+                        lictype.v = 6
                         sampSendChat("/me взяв мед.карту в руки начал её проверять")
                         wait(2000)
                         sampSendChat("/do Мед.карта в норме.")
