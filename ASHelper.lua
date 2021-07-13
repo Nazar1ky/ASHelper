@@ -9,8 +9,8 @@ local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 3
-local script_vers_text = "1.1"
+local script_vers = 4
+local script_vers_text = "1.2"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -21,6 +21,7 @@ local script_path = thisScript().path
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local tag = "{62E200}[ASHelper]: {FFFFFF}"
+local color_err = "{62E200}[ASHelper]: {FF0000}"
 local inprocess = false
 
 
@@ -44,26 +45,29 @@ local licID = imgui.ImBuffer(256)
 local checkbox1 = imgui.ImBool(false)
 local checkbox2 = imgui.ImBool(false)
 local checkbox3 = imgui.ImBool(false)
+local checkbox4 = imgui.ImBool(false)
 local isp_menu = imgui.ImBool(false)
 local lic_menu = imgui.ImBool(false)
 local other_menu = imgui.ImBool(false)
+local settings_menu = imgui.ImBool(false)
 local anim_cheat = imgui.ImBool(false)
-local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
-local selected_item = imgui.ImInt(0)
+local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
+local lictype = imgui.ImInt(0)
 
 local ex, ey = getScreenResolution()
 function imgui.OnDrawFrame()
     local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
     if main_window_state.v then
-        imgui.SetNextWindowSize(imgui.ImVec2(580, 220), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(580, 250), imgui.Cond.FirstUseEver)
         imgui.Begin('AutoSchool helper', main_window_state)
         imgui.InputText(u8'ID Игрока для манипуляций', playerID)
         imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
         imgui.Checkbox(u8'PRICE LIST', isp_menu)
         imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
         imgui.Checkbox(u8'Прочее', other_menu)
+        imgui.Checkbox(u8'Настройки', settings_menu)
         imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
-        imgui.Text(u8'Script version:' .. script_vers_text)
+        imgui.Text(u8'Версия скрипта: ' .. script_vers_text)
         imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
         imgui.End()
     end
@@ -99,6 +103,7 @@ function imgui.OnDrawFrame()
         end
         if imgui.Button(u8'Выдать лицензию (nonRP)') then
             sampSendChat('/givelicense '.. playerID.v)
+            print(sampGetPlayerNickname(playerID.v))
         end
         if imgui.Button(u8'Пожелать хорошего дня') then
             if inprocess == false then
@@ -109,9 +114,10 @@ function imgui.OnDrawFrame()
 
         end
         imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
+        imgui.Checkbox(u8'Автопроверка мед. карты', checkbox4)
         imgui.Checkbox(u8'Автолицензия (BETA)', checkbox3)
         if checkbox3.v then
-            if imgui.Combo(u8'Выберите лицензию', selected_item, arr_lic, 7) then
+            if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 8) then
                 print(selected_item.v)
             end
         end
@@ -160,6 +166,19 @@ function imgui.OnDrawFrame()
         end
         imgui.End()
     end
+    if settings_menu.v then
+        imgui.ShowCursor = true
+        imgui.SetNextWindowSize(imgui.ImVec2(200, 100), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+        imgui.Begin(u8'AutoSchool Helper || Настройки', nil, imgui.WindowFlags.NoCollapse)
+        if imgui.Button(u8'Перезагрузить скрипт') then
+            thisScript():reload()
+        end
+        if imgui.Button(u8'Выгрузить скрипт') then
+            thisScript():unload()
+        end
+        imgui.End()
+    end
 end
 function main()
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -169,7 +188,7 @@ function main()
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             updateIni = inicfg.load(nil, update_path)
             if tonumber(updateIni.info.vers) > script_vers then
-                sampAddChatMessage(tag .. "Есть обновление! Версия: " .. updateIni.info.vers_text, 0xFFFF00)
+                sampAddChatMessage(tag .. "Есть обновление! Версия: " .. updateIni.info.vers_text .. ", Попытаюсь установить", 0xFFFF00)
                 update_state = true
             end
             os.remove(update_path)
@@ -199,6 +218,12 @@ function main()
                     end
                 end
             end
+            local idGun = getCurrentCharWeapon(playerPed)
+            -- if idGun == 24 then
+            --     sampSendChat("/me достал дигл")
+            -- else
+            --     sampSendChat("/me убрал дигл")
+            -- end
     end
 end
 function privet()
@@ -214,7 +239,7 @@ function privet()
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function pilot()
@@ -230,7 +255,7 @@ function pilot()
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function med(myid)
@@ -251,7 +276,7 @@ function med(myid)
             end
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function licgive(id)
@@ -260,36 +285,30 @@ function licgive(id)
             inprocess = not inprocess
             sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
             sampSendChat('Секунду...')
-            wait(1500)
-            sampSendChat('/do На столе лежит печать и лицензия с бланком.')
-            wait(1500)
-            sampSendChat('/me берет со стола бланк и достает из кармана рубашки ручку')
-            wait(1500)
-            sampSendChat('/me заполняет бланк на получение лицензии')
-            wait(1500)
-            sampSendChat('/me начинает заполнять лицензию')
-            wait(1500)
-            sampSendChat('/do Лицензия заполнена.')
-            wait(1500)
-            sampSendChat('/me взял печать в руки и поставил оттеск с названием "ГЦЛ"')
-            wait(1500)
-            sampSendChat('/givelicense '.. id)
-            wait(500)
-            sampAddChatMessage(tag .. "Выполнено! Выберите нужную лицензию:", 0xFFFF00)
+            wait(2000)
+            sampSendChat('/me {gender:взял|взяла} со стола бланк и {gender:заполнил|заполнила} ручкой бланк на получение лицензии')
+            wait(2000)
+            sampSendChat('/do Спустя некоторое время бланк на получение лицензии был заполнен.')
+            wait(2000)
+            sampSendChat('/me распечатав лицензию на оружие {gender:передал|передала} её человеку напротив')
             inprocess = not inprocess
         end)
     else
-        sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+        sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
     end
 end
 function se.onServerMessage(color, text)
     if text:find('%[Информация%]%s+%{%w+%}Вы успешно продали лицензию') then
         if checkbox1.v then
-            lua_thread.create(function()
-                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
-                wait(500)
-                sampAddChatMessage(tag .. "Клиент купил лицензию, деньги начислены.", 0xFFFF00)
-            end)
+            if inprocess == false then
+                lua_thread.create(function()
+                    sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
+                    wait(500)
+                    sampAddChatMessage(tag .. "Клиент купил лицензию, деньги начислены.", 0xFFFF00)
+                end)
+            else
+                sampAddChatMessage(color_err .. "Вы чтото выполняете, выполнить пожелание не удалось!", 0xFFFF00)
+            end
         end
     end
 end
@@ -298,17 +317,56 @@ end
 --         sampSendDialogResponse(6, 1, 0, nil)
 --     end
 -- end
--- function se.onShowDialog(dialogId, style, title, button1, button2, text)
---     if title:find("%Выберите лицензию") then
---         if dialogId == 6 then
---             lua_thread.create(function()
---                 wait(500)
---                 sampSendDialogResponse(sampGetCurrentDialogId(), 1, 4, _)
---             end)
---             return false
---         end
---     end
--- end
+function se.onShowDialog(dialogId, style, title, button1, button2, text)
+    if checkbox3.v then
+        if dialogId == 6 then
+            sampSendDialogResponse(sampGetCurrentDialogId(), 1, selected_item.v, _)
+            return false
+        end
+    end
+    if dialogId == 1234 then
+        if checkbox4.v then
+            if text:find("Имя: "..sampGetPlayerNickname(playerID.v)) then
+                if text:find("Полностью здоровый") then
+                    lua_thread.create(function()
+                        while inprocess do
+                            wait(0)
+                        end
+                        inprocess = true
+                        sampSendChat("/me взяв мед.карту в руки начал её проверять")
+                        wait(2000)
+                        sampSendChat("/do Мед.карта в норме.")
+                        wait(2000)
+                        sampSendChat("/todo Всё в порядке* отдавая мед.карту обратно")
+                        wait(2000)
+                        sampSendChat('/me {gender:взял|взяла} со стола бланк и {gender:заполнил|заполнила} ручкой бланк на получение лицензии на оружие')
+                        wait(2000)
+                        sampSendChat('/do Спустя некоторое время бланк на получение лицензии был заполнен.')
+                        wait(2000)
+                        sampSendChat('/me распечатав лицензию на оружие {gender:передал|передала} её человеку напротив')
+                        sampSendChat('/givelicense ' .. playerID)
+                        inprocess = false
+                    end)
+                else 
+                    lua_thread.create(function()
+                        inprocess = true
+                        ASHelperMessage('Человек не полностью здоровый, требуется поменять мед.карту!')
+                        sampSendChat("/me взяв мед.карту в руки начал её проверять")
+                        wait(2000)
+                        sampSendChat("/do Мед.карта не в норме.")
+                        wait(2000)
+                        sampSendChat("/todo К сожалению, в мед.карте написано, что у вас есть отклонения.* отдавая мед.карту обратно")
+                        wait(2000)
+                        sampSendChat("Обновите её и приходите снова!")
+                        inprocess = false
+                    end)
+                end
+                return false
+            end
+        end
+    end
+end
+
 function se.onSendCommand(cmd)
     if cmd:find('{gender:%A+|%A+}') then
         local male, female = cmd:match('{gender:(%A+)|(%A+)}')
