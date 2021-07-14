@@ -9,8 +9,8 @@ local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 5
-local script_vers_text = "1.3"
+local script_vers = 6
+local script_vers_text = "1.4 FINAL"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -29,162 +29,220 @@ local confige = config.settings
 local gender = confige.gender
 local keyr = confige.keyr
 
--- if not _ then
---         sampAddChatMessage("Библиотека imgui не найдена... Установим!", -1)
---         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/imgui.lua', 'moonloader/lib/imgui.lua')
---         downloadUrlToFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/MoonImGui.dll', 'moonloader/lib/MoonImGui.dll')
---         thisScript():reload()
---         return false
--- end
-
-
-
-    local main_window_state = imgui.ImBool(false)
-    local playerID = imgui.ImBuffer(256)
-    local playerExpel = imgui.ImBuffer(256)
-    local licID = imgui.ImBuffer(256)
-    local checkbox1 = imgui.ImBool(false)
-    local checkbox2 = imgui.ImBool(false)
-    local checkbox3 = imgui.ImBool(false)
-    local isp_menu = imgui.ImBool(false)
-    local lic_menu = imgui.ImBool(false)
-    local other_menu = imgui.ImBool(false)
-    local settings_menu = imgui.ImBool(false)
-
-    local settings_menu = imgui.ImBool(false)
-    local anim_cheat = imgui.ImBool(false)
-    local arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
-    local lictype = imgui.ImInt(0)
-
-local ex, ey = getScreenResolution()
-function imgui.OnDrawFrame()
-    local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
-    if main_window_state.v then
-        imgui.SetNextWindowSize(imgui.ImVec2(580, 250), imgui.Cond.FirstUseEver)
-        imgui.Begin('AutoSchool helper', main_window_state)
-        imgui.InputText(u8'ID Игрока для манипуляций', playerID)
-        imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
-        imgui.Checkbox(u8'PRICE LIST', isp_menu)
-        imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
-        imgui.Checkbox(u8'Прочее', other_menu)
-        imgui.Checkbox(u8'Настройки', settings_menu)
-        imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
-        imgui.Text(u8'Версия скрипта: ' .. script_vers_text)
-        imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
-        imgui.End()
+function checker()
+    local function DownloadFile(url, file)
+		downloadUrlToFile(url,file,function(id,status)
+			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+			end
+		end)
+		while not doesFileExist(file) do
+			wait(1000)
+		end
+	end
+    if not imguicheck then
+            sampAddChatMessage(tag .. "Библиотека imgui не найдена... Установим!", -1)
+            DownloadFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/imgui.lua', 'moonloader/lib/imgui.lua')
+            DownloadFile('https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/MoonImGui.dll', 'moonloader/lib/MoonImGui.dll')
+            sampAddChatMessage(tag .. "Библиотека imgui была установлена! Перезапускаю...!", -1)
+            thisScript():reload()
+            return false
     end
-    if isp_menu.v then
-        imgui.ShowCursor = true
-        imgui.SetNextWindowSize(imgui.ImVec2(300, 170), imgui.Cond.FirstUseEver)
-        imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || PRICE LIST', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'PRICE LIST:\nНа авто: 10.000\nНа мото: 12.000\nНа рыбалку: 21.000\nВодный транспорт: 20.000\nОружие: 50.000(Требуеться Мед. карта\nОхота: 100.000\nНа распопки: 200.000\nНа полеты 20.000 (Сдавать в авиашколе)')
-        imgui.End()
-    end
-    if lic_menu.v then
-        imgui.ShowCursor = true
-        imgui.SetNextWindowSize(imgui.ImVec2(430, 275), imgui.Cond.FirstUseEver)
-        imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || Продажа лицензий', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'При продаже лицензии на оружие нужно проверить мед. карту!')
-        if imgui.Button(u8'Приставиться') then
-            privet()
-        end
-        if imgui.Button(u8'Лицензия на пилота') then
-            pilot()
-        end
-        if imgui.Button(u8'Проверить мед. карту') then
-                med(myid)
-        end
-        if imgui.Button(u8'Выдать лицензию') then
-            if playerID.v == '' then
-                sampAddChatMessage(tag .. "Вы не указали playerID !", 0xFFFF00)
-            else 
-                licgive(playerID.v)
-            end
-        end
-        if imgui.Button(u8'Выдать лицензию (nonRP)') then
-            sampSendChat('/givelicense '.. playerID.v)
-            print(sampGetPlayerNickname(playerID.v))
-        end
-        if imgui.Button(u8'Пожелать хорошего дня') then
-            if inprocess == false then
-                sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
-            else
-                sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
-            end
+end
 
-        end
-        imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
-        imgui.Checkbox(u8'Автосистема (BETA)', checkbox3)
-        if checkbox3.v then
-            if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 8) then
-                print(lictype.v)
-            end
-        end
+
+if imguicheck then
+    imgui.SwitchContext()
+    local style = imgui.GetStyle()
+    local colors = style.Colors
+    local clr = imgui.Col
+    local ImVec4 = imgui.ImVec4
+
+    colors[clr.Text] = ImVec4(1.00, 1.00, 1.00, 1.00)
+    colors[clr.TextDisabled] = ImVec4(0.60, 0.60, 0.60, 1.00)
+    colors[clr.WindowBg] = ImVec4(0.11, 0.10, 0.11, 1.00)
+    colors[clr.ChildWindowBg] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.PopupBg] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.Border] = ImVec4(0.86, 0.86, 0.86, 1.00)
+    colors[clr.BorderShadow] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.FrameBg] = ImVec4(0.21, 0.20, 0.21, 0.60)
+    colors[clr.FrameBgHovered] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.FrameBgActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.TitleBg] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.TitleBgCollapsed] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.TitleBgActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.MenuBarBg] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.ScrollbarBg] = ImVec4(0.00, 0.46, 0.65, 0.00)
+    colors[clr.ScrollbarGrab] = ImVec4(0.00, 0.46, 0.65, 0.44)
+    colors[clr.ScrollbarGrabHovered] = ImVec4(0.00, 0.46, 0.65, 0.74)
+    colors[clr.ScrollbarGrabActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.ComboBg] = ImVec4(0.15, 0.14, 0.15, 1.00)
+    colors[clr.CheckMark] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.SliderGrab] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.SliderGrabActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.Button] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.ButtonHovered] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.ButtonActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.Header] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.HeaderHovered] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.HeaderActive] = ImVec4(0.00, 0.46, 0.65, 1.00)
+    colors[clr.ResizeGrip] = ImVec4(1.00, 1.00, 1.00, 0.30)
+    colors[clr.ResizeGripHovered] = ImVec4(1.00, 1.00, 1.00, 0.60)
+    colors[clr.ResizeGripActive] = ImVec4(1.00, 1.00, 1.00, 0.90)
+    colors[clr.CloseButton] = ImVec4(1.00, 0.10, 0.24, 0.00)
+    colors[clr.CloseButtonHovered] = ImVec4(0.00, 0.10, 0.24, 0.00)
+    colors[clr.CloseButtonActive] = ImVec4(1.00, 0.10, 0.24, 0.00)
+    colors[clr.PlotLines] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.PlotLinesHovered] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.PlotHistogram] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.PlotHistogramHovered] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.TextSelectedBg] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.ModalWindowDarkening] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    main_window_state = imgui.ImBool(false)
+    playerID = imgui.ImBuffer(256)
+    playerExpel = imgui.ImBuffer(256)
+    licID = imgui.ImBuffer(256)
+    checkbox1 = imgui.ImBool(false)
+    checkbox2 = imgui.ImBool(false)
+    checkbox3 = imgui.ImBool(false)
+    isp_menu = imgui.ImBool(false)
+    lic_menu = imgui.ImBool(false)
+    other_menu = imgui.ImBool(false)
+    settings_menu = imgui.ImBool(false)
+    settings_menu = imgui.ImBool(false)
+    anim_cheat = imgui.ImBool(false)
+    arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
+    lictype = imgui.ImInt(0)
+
+    local ex, ey = getScreenResolution()
+    function imgui.OnDrawFrame()
+        local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+        if main_window_state.v then
+            imgui.SetNextWindowSize(imgui.ImVec2(580, 250), imgui.Cond.FirstUseEver)
+            imgui.Begin('AutoSchool helper', main_window_state)
+            imgui.InputText(u8'ID Игрока для манипуляций', playerID)
+            imgui.Checkbox(u8'При нацеливание playerID заполняеться айди в того кого целитесь', checkbox2)
+            imgui.Checkbox(u8'PRICE LIST', isp_menu)
+            imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
+            imgui.Checkbox(u8'Прочее', other_menu)
+            imgui.Checkbox(u8'Настройки', settings_menu)
+            imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
+            imgui.Text(u8'Версия скрипта: ' .. script_vers_text)
+            imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
             imgui.End()
         end
-    if other_menu.v then
-        imgui.ShowCursor = true
-        imgui.SetNextWindowSize(imgui.ImVec2(200, 320), imgui.Cond.FirstUseEver)
-        imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || Прочее', nil, imgui.WindowFlags.NoCollapse)
-        imgui.Text(u8'По работе:')
-        imgui.InputText(u8'Причина', playerExpel)
-        if imgui.Button(u8'Выгнать из автошколы') then
-            if  playerID.v == '' or playerExpel.v == '' then
-                sampAddChatMessage(tag .. "Вы не указали причину либо playerID !", 0xFFFF00)
-                print(1)
-            else
-                print(0)
-                sampSendChat('/expel '.. playerID.v .. ' ' .. u8:decode(playerExpel.v))
+        if isp_menu.v then
+            imgui.ShowCursor = true
+            imgui.SetNextWindowSize(imgui.ImVec2(300, 170), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'AutoSchool Helper || PRICE LIST', nil, imgui.WindowFlags.NoCollapse)
+            imgui.Text(u8'PRICE LIST:\nНа авто: 10.000\nНа мото: 12.000\nНа рыбалку: 21.000\nВодный транспорт: 20.000\nОружие: 50.000(Требуеться Мед. карта\nОхота: 100.000\nНа распопки: 200.000\nНа полеты 20.000 (Сдавать в авиашколе)')
+            imgui.End()
+        end
+        if lic_menu.v then
+            imgui.ShowCursor = true
+            imgui.SetNextWindowSize(imgui.ImVec2(430, 275), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'AutoSchool Helper || Продажа лицензий', nil, imgui.WindowFlags.NoCollapse)
+            imgui.Text(u8'При продаже лицензии на оружие нужно проверить мед. карту!')
+            if imgui.Button(u8'Представиться') then
+                privet()
             end
+            if imgui.Button(u8'Лицензия на пилота') then
+                pilot()
+            end
+            if imgui.Button(u8'Проверить мед. карту') then
+                    med(myid)
+            end
+            if imgui.Button(u8'Выдать лицензию') then
+                if playerID.v == '' then
+                    sampAddChatMessage(tag .. "Вы не указали playerID !", 0xFFFF00)
+                else 
+                    licgive(playerID.v)
+                end
+            end
+            if imgui.Button(u8'Выдать лицензию (nonRP)') then
+                sampSendChat('/givelicense '.. playerID.v)
+                print(sampGetPlayerNickname(playerID.v))
+            end
+            if imgui.Button(u8'Пожелать хорошего дня') then
+                if inprocess == false then
+                    sampSendChat('/todo Удачного вам дня*улыбнувшись посетителю')
+                else
+                    sampAddChatMessage(tag .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
+                end
+
+            end
+            imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
+            imgui.Checkbox(u8'Автосистема (BETA)', checkbox3)
+            if checkbox3.v then
+                if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 8) then
+                    print(lictype.v)
+                end
+            end
+                imgui.End()
+            end
+        if other_menu.v then
+            imgui.ShowCursor = true
+            imgui.SetNextWindowSize(imgui.ImVec2(200, 320), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'AutoSchool Helper || Прочее', nil, imgui.WindowFlags.NoCollapse)
+            imgui.Text(u8'По работе:')
+            imgui.InputText(u8'Причина', playerExpel)
+            if imgui.Button(u8'Выгнать из автошколы') then
+                if  playerID.v == '' or playerExpel.v == '' then
+                    sampAddChatMessage(tag .. "Вы не указали причину либо playerID !", 0xFFFF00)
+                    print(1)
+                else
+                    print(0)
+                    sampSendChat('/expel '.. playerID.v .. ' ' .. u8:decode(playerExpel.v))
+                end
+            end
+            if imgui.Button(u8'Рабочее портфолио') then
+                sampSendChat('/jobprogress')
+            end
+            if imgui.Button(u8'Список во фракции(online)') then
+                sampSendChat('/members')
+            end
+            if imgui.Button(u8'Посмотреть время') then
+                sampSendChat('/time')
+            end
+            imgui.Text(u8'Другое:')
+            if imgui.Button(u8'Меню') then
+                sampSendChat('/mm')
+            end
+            if imgui.Button(u8'Настройки') then
+                sampSendChat('/settings')
+            end
+            if imgui.Button(u8'Помощь') then
+                sampSendChat('/help')
+            end
+            if imgui.Button(u8'Навигатор') then
+                sampSendChat('/gps')
+            end
+            if imgui.Button(u8'Инвентарь') then
+                sampSendChat('/invent')
+            end
+            imgui.End()
         end
-        if imgui.Button(u8'Рабочее портфолио') then
-            sampSendChat('/jobprogress')
+        if settings_menu.v then
+            imgui.ShowCursor = true
+            imgui.SetNextWindowSize(imgui.ImVec2(200, 100), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'AutoSchool Helper || Настройки', nil, imgui.WindowFlags.NoCollapse)
+            if imgui.Button(u8'Перезагрузить скрипт') then
+                thisScript():reload()
+            end
+            if imgui.Button(u8'Выгрузить скрипт') then
+                thisScript():unload()
+            end
+            imgui.End()
         end
-        if imgui.Button(u8'Список во фракции(online)') then
-            sampSendChat('/members')
-        end
-        if imgui.Button(u8'Посмотреть время') then
-            sampSendChat('/time')
-        end
-        imgui.Text(u8'Другое:')
-        if imgui.Button(u8'Меню') then
-            sampSendChat('/mm')
-        end
-        if imgui.Button(u8'Настройки') then
-            sampSendChat('/settings')
-        end
-        if imgui.Button(u8'Помощь') then
-            sampSendChat('/help')
-        end
-        if imgui.Button(u8'Навигатор') then
-            sampSendChat('/gps')
-        end
-        if imgui.Button(u8'Инвентарь') then
-            sampSendChat('/invent')
-        end
-        imgui.End()
-    end
-    if settings_menu.v then
-        imgui.ShowCursor = true
-        imgui.SetNextWindowSize(imgui.ImVec2(200, 100), imgui.Cond.FirstUseEver)
-        imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
-        imgui.Begin(u8'AutoSchool Helper || Настройки', nil, imgui.WindowFlags.NoCollapse)
-        if imgui.Button(u8'Перезагрузить скрипт') then
-            thisScript():reload()
-        end
-        if imgui.Button(u8'Выгрузить скрипт') then
-            thisScript():unload()
-        end
-        imgui.End()
     end
 end
 function main()
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
-
+    checker()
     downloadUrlToFile(update_url, update_path, function(id, status)
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             updateIni = inicfg.load(nil, update_path)
@@ -207,24 +265,26 @@ function main()
             break
         end
             if wasKeyPressed(keyr) then
+                if imguicheck then
                     main_window_state.v = not main_window_state.v
+                else
+                    sampAddChatMessage(tag .. "У вас не установлена библиотека imgui...")
+                end
             end
+            if imguicheck then
             imgui.Process = main_window_state.v
+            end
             local valid, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if valid and doesCharExist(ped) then
                 local result, id = sampGetPlayerIdByCharHandle(ped)
                 if result then
-                    if checkbox2.v then
-                        playerID.v = tostring(id)
+                    if imguicheck then
+                        if checkbox2.v then
+                            playerID.v = tostring(id)
+                        end
                     end
                 end
             end
-            local idGun = getCurrentCharWeapon(playerPed)
-            -- if idGun == 24 then
-            --     sampSendChat("/me достал дигл")
-            -- else
-            --     sampSendChat("/me убрал дигл")
-            -- end
     end
 end
 function privet()
@@ -386,9 +446,11 @@ function se.onSendCommand(cmd)
     end
 end
 function se.onApplyPlayerAnimation(playerId, animLib, animName, frameDelta, loop, lockX, lockY, freeze, time)
-    if anim_cheat.v then
-        if playerId == select(2, sampGetPlayerIdByCharHandle(PLAYER_PED)) then
-            if animLib == 'CRACK' and animName == 'crckdeth2' then return false end
+    if imguicheck then
+        if anim_cheat.v then
+            if playerId == select(2, sampGetPlayerIdByCharHandle(PLAYER_PED)) then
+                if animLib == 'CRACK' and animName == 'crckdeth2' then return false end
+            end
         end
     end
 end
