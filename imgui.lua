@@ -1345,7 +1345,7 @@ local function load_default_font()
 	imgui.SwitchContext()
 	local builder = imgui.ImFontAtlasGlyphRangesBuilder()
 	builder:AddRanges(imgui.GetIO().Fonts:GetGlyphRangesCyrillic())
-	builder:AddText('вЂљвЂћвЂ¦вЂ вЂЎв‚¬вЂ°вЂ№вЂ�вЂ™вЂњвЂќвЂўвЂ“вЂ”в„ўвЂєв„–')
+	builder:AddText('‚„…†‡€‰‹‘’“”•–—™›№')
 	glyph_ranges = builder:BuildRanges()
 	imgui.GetIO().Fonts:AddFontFromFileTTF(font_path, 14.0, nil, glyph_ranges)
 	font_loaded = true
