@@ -9,8 +9,8 @@ local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 6
-local script_vers_text = "1.4 FINAL"
+local script_vers = 7
+local script_vers_text = "1.5 FIX"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -331,10 +331,10 @@ function med(myid)
             sampAddChatMessage(tag .. "Выполнено! Убедитесь что в Мед. карте написано 'Полностью здоровый(ая)'", 0xFFFF00)
             inprocess = not inprocess
             wait(500)
-            if checkbox3.v then
-                lictype.v = 4
-                sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
-            end
+            -- if checkbox3.v then
+            --     lictype.v = 4
+            --     sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
+            -- end
         end)
     else
         sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
@@ -351,7 +351,7 @@ function licgive(id)
             wait(2000)
             sampSendChat('/do Спустя некоторое время бланк на получение лицензии был заполнен.')
             wait(2000)
-            sampSendChat('/me распечатав лицензию на оружие {gender:передал|передала} её человеку напротив')
+            sampSendChat('/me распечатав лицензию и {gender:передал|передала} её человеку напротив')
             wait(1700)
             sampSendChat('/givelicense '.. playerID.v)
             inprocess = not inprocess
@@ -383,12 +383,12 @@ end
 function se.onShowDialog(dialogId, style, title, button1, button2, text)
     if dialogId == 6 then
         if checkbox3.v then
-            sampSendDialogResponse(sampGetCurrentDialogId(), 1, lictype.v, _)
+            sampSendDialogResponse(6, 1, lictype.v, _)
             return false
         end
     end
     if dialogId == 1234 then
-        if checkbox3.v then
+        if checkbox3.v and inprocess == false then
             if text:find("Имя: "..sampGetPlayerNickname(playerID.v)) then
                 if text:find("Полностью здоровый") then
                     lua_thread.create(function()
@@ -396,7 +396,7 @@ function se.onShowDialog(dialogId, style, title, button1, button2, text)
                             wait(0)
                         end
                         inprocess = true
-                        lictype.v = 6
+                        lictype.v = 5
                         sampSendChat("/me взяв мед.карту в руки начал её проверять")
                         wait(2000)
                         sampSendChat("/do Мед.карта в норме.")
@@ -408,7 +408,8 @@ function se.onShowDialog(dialogId, style, title, button1, button2, text)
                         sampSendChat('/do Спустя некоторое время бланк на получение лицензии был заполнен.')
                         wait(2000)
                         sampSendChat('/me распечатав лицензию на оружие {gender:передал|передала} её человеку напротив')
-                        sampSendChat('/givelicense ' .. playerID)
+                        wait(1700)
+                        sampSendChat('/givelicense ' .. playerID.v)
                         inprocess = false
                     end)
                 else 
