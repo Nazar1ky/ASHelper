@@ -9,8 +9,8 @@ local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 7
-local script_vers_text = "1.5 FIX"
+local script_vers = 8
+local script_vers_text = "1.6"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -110,7 +110,7 @@ if imguicheck then
     settings_menu = imgui.ImBool(false)
     settings_menu = imgui.ImBool(false)
     anim_cheat = imgui.ImBool(false)
-    arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Раскопки", u8"Такси"}
+    arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Охота", u8"Раскопки", u8"Такси"}
     lictype = imgui.ImInt(0)
 
     local ex, ey = getScreenResolution()
@@ -175,7 +175,7 @@ if imguicheck then
             imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
             imgui.Checkbox(u8'Автосистема (BETA)', checkbox3)
             if checkbox3.v then
-                if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 8) then
+                if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 9) then
                     print(lictype.v)
                 end
             end
@@ -328,13 +328,8 @@ function med(myid)
             wait(1000)
             sampSendChat('/b /showmc ' .. myid)
             wait(500)
-            sampAddChatMessage(tag .. "Выполнено! Убедитесь что в Мед. карте написано 'Полностью здоровый(ая)'", 0xFFFF00)
+            sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
             inprocess = not inprocess
-            wait(500)
-            -- if checkbox3.v then
-            --     lictype.v = 4
-            --     sampAddChatMessage(tag .. "Автолицензия выбрана: Оружие'", 0xFFFF00)
-            -- end
         end)
     else
         sampAddChatMessage(color_err .. "Вы уже чтото выполняете, подождите!", 0xFFFF00)
@@ -375,11 +370,6 @@ function se.onServerMessage(color, text)
         end
     end
 end
--- function se.onShowDialog(dialogId, style, title, button1, button2, text)
---     if dialogId == 6 then
---         sampSendDialogResponse(6, 1, 0, nil)
---     end
--- end
 function se.onShowDialog(dialogId, style, title, button1, button2, text)
     if dialogId == 6 then
         if checkbox3.v then
