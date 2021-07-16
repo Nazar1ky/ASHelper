@@ -2,15 +2,14 @@ require "lib.moonloader"
 
 local dlstatus = require('moonloader').download_status
 local se = require 'samp.events'
-local config = require "config"
 local imguicheck, imgui	= pcall(require, "imgui")
-local key = require 'vkeys'
+local vkeys = require 'vkeys'
 local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 8
-local script_vers_text = "1.6"
+local script_vers = 9
+local script_vers_text = "1.7 BETA"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -24,10 +23,14 @@ local tag = "{62E200}[ASHelper]: {FFFFFF}"
 local color_err = "{62E200}[ASHelper]: {FF0000}"
 local inprocess = false
 
-
-local confige = config.settings
-local gender = confige.gender
-local keyr = confige.keyr
+local configuration = inicfg.load({
+	main_settings = {
+		myrankint = 0,
+        myrank = '',
+        gender = 0,
+        fastmenu = "X"
+    },
+}, "AS Helper")
 
 function checker()
     local function DownloadFile(url, file)
@@ -101,6 +104,7 @@ if imguicheck then
     playerID = imgui.ImBuffer(256)
     playerExpel = imgui.ImBuffer(256)
     licID = imgui.ImBuffer(256)
+    openmenu = imgui.ImBuffer(''..configuration.main_settings.fastmenu, 256)
     checkbox1 = imgui.ImBool(false)
     checkbox2 = imgui.ImBool(false)
     checkbox3 = imgui.ImBool(false)
@@ -112,6 +116,8 @@ if imguicheck then
     anim_cheat = imgui.ImBool(false)
     arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Охота", u8"Раскопки", u8"Такси"}
     lictype = imgui.ImInt(0)
+    arr_gender = {u8"Мужчина", u8"Женщина"}
+    gendertype = imgui.ImInt(configuration.main_settings.gender)
 
     local ex, ey = getScreenResolution()
     function imgui.OnDrawFrame()
@@ -124,9 +130,10 @@ if imguicheck then
             imgui.Checkbox(u8'PRICE LIST', isp_menu)
             imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
             imgui.Checkbox(u8'Прочее', other_menu)
-            imgui.Checkbox(u8'Настройки', settings_menu)
+            imgui.Checkbox(u8'Настройки для работы', settings_menu)
             imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
             imgui.Text(u8'Версия скрипта: ' .. script_vers_text)
+            imgui.Text(u8"Ваш ранг: "..u8(configuration.main_settings.myrank).." ("..configuration.main_settings.myrankint..")")
             imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
             imgui.End()
         end
@@ -173,7 +180,7 @@ if imguicheck then
 
             end
             imgui.Checkbox(u8'Писать при успешной покупки в чат пожелание', checkbox1)
-            imgui.Checkbox(u8'Автосистема (BETA)', checkbox3)
+            imgui.Checkbox(u8'Автосистема', checkbox3)
             if checkbox3.v then
                 if imgui.Combo(u8'Выберите лицензию', lictype, arr_lic, 9) then
                     print(lictype.v)
@@ -229,6 +236,14 @@ if imguicheck then
             imgui.SetNextWindowSize(imgui.ImVec2(200, 100), imgui.Cond.FirstUseEver)
             imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'AutoSchool Helper || Настройки', nil, imgui.WindowFlags.NoCollapse)
+            imgui.InputText(u8'Кнопка открытия меню', openmenu)
+            if imgui.Combo(u8'Выберите пол', gendertype, arr_gender, 2) then
+            end
+            if imgui.Button(u8'Сохранить') then
+                configuration.main_settings.gender = gendertype.v
+                configuration.main_settings.fastmenu = openmenu.v
+                inicfg.save(configuration,"AS Helper")
+            end
             if imgui.Button(u8'Перезагрузить скрипт') then
                 thisScript():reload()
             end
@@ -243,6 +258,14 @@ function main()
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     checker()
+    name = string.gsub(sampGetPlayerNickname(select(2,sampGetPlayerIdByCharHandle(playerPed))), "_", " ")
+    getmyrank = true
+    sampSendChat("/stats")
+    if not doesFileExist('moonloader/config/AS Helper.ini') then
+        if inicfg.save(configuration, 'AS Helper.ini') then
+			sampAddChatMessage(tag .. "Создан файл конфигурации.")
+		end
+    end
     downloadUrlToFile(update_url, update_path, function(id, status)
         if status == dlstatus.STATUS_ENDDOWNLOADDATA then
             updateIni = inicfg.load(nil, update_path)
@@ -251,6 +274,16 @@ function main()
                 update_state = true
             end
             os.remove(update_path)
+        end
+    end)
+    sampRegisterChatCommand("devmaxrank", function()
+        if sampGetPlayerNickname(select(2,sampGetPlayerIdByCharHandle(playerPed))) == "Sergey_Fedovich" then
+            devmaxrankp = not devmaxrankp
+            sampAddChatMessage("{ff6633}[Режим разработчика] {FFFFFF}Имитировать максимальный ранг: " ..(devmaxrankp and "{00FF00}Включено" or "{FF0000}Выключено"), 0xff6633)
+            getmyrank = true
+            sampSendChat("/stats")
+        else
+            sampAddChatMessage("{ff6347}[Ошибка] {FFFFFF}Неизвестная команда! Введите /help для просмотра доступных функций.",0xff6347)
         end
     end)
     while true do
@@ -264,7 +297,7 @@ function main()
             end)
             break
         end
-            if wasKeyPressed(keyr) then
+            if wasKeyPressed(vkeys.name_to_id(configuration.main_settings.fastmenu,true)) then
                 if imguicheck then
                     main_window_state.v = not main_window_state.v
                 else
@@ -272,7 +305,7 @@ function main()
                 end
             end
             if imguicheck then
-            imgui.Process = main_window_state.v
+                imgui.Process = main_window_state.v
             end
             local valid, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if valid and doesCharExist(ped) then
@@ -285,6 +318,7 @@ function main()
                     end
                 end
             end
+        
     end
 end
 function privet()
@@ -292,9 +326,9 @@ function privet()
         lua_thread.create(function()
             inprocess = not inprocess
             sampAddChatMessage(tag .. "Выполняю...", 0xFFFF00)
-            sampSendChat('Приветствую, я "' .. confige.rank .. '" данного лицензированного центра, чем могу вам помочь?')
+            sampSendChat('Приветствую, я "' .. configuration.main_settings.myrank .. '" данного лицензированного центра, чем могу вам помочь?')
             wait(1500)
-            sampSendChat('/do На груди весит бейджик с надписью "' .. confige.rank .. ' - '.. confige.name .. '.')
+            sampSendChat('/do На груди весит бейджик с надписью "' .. configuration.main_settings.myrank .. ' - '.. name .. '.')
             wait(500)
             sampAddChatMessage(tag .. "Выполнено!", 0xFFFF00)
             inprocess = not inprocess
@@ -376,8 +410,7 @@ function se.onShowDialog(dialogId, style, title, button1, button2, text)
             sampSendDialogResponse(6, 1, lictype.v, _)
             return false
         end
-    end
-    if dialogId == 1234 then
+    elseif dialogId == 1234 then
         if checkbox3.v and inprocess == false then
             if text:find("Имя: "..sampGetPlayerNickname(playerID.v)) then
                 if text:find("Полностью здоровый") then
@@ -419,13 +452,39 @@ function se.onShowDialog(dialogId, style, title, button1, button2, text)
                 return false
             end
         end
+    elseif dialogId == 235 and getmyrank then
+        if text:find('Инструкторы') then
+            for DialogLine in text:gmatch('[^\r\n]+') do
+                local nameRankStats, getStatsRank = DialogLine:match('Должность: {B83434}(.+)%p(%d+)%p')
+                if tonumber(getStatsRank) then
+                    local rangint = tonumber(getStatsRank)
+                    local rang = nameRankStats
+                    if rangint ~= configuration.main_settings.myrankint then
+                        sampAddChatMessage(tag .. "Ваш ранг был обновлён на "..rang.." ("..rangint..")")
+                    end
+                    configuration.main_settings.myrank = rang
+                    configuration.main_settings.myrankint = rangint
+                    if nameRankStats:find('Упраляющий') or devmaxrankp then
+                        getStatsRank = 10
+                        configuration.main_settings.myrank = "Упраляющий"
+                        configuration.main_settings.myrankint = 10
+                    end
+                    inicfg.save(configuration,"AS Helper")
+                end
+            end
+        else
+            sampAddChatMessage(color_err .. "Вы не работаете в автошколе, скрипт выгружен!")
+            thisScript():unload()
+        end
+        getmyrank = false
+        return false
     end
 end
 
 function se.onSendCommand(cmd)
     if cmd:find('{gender:%A+|%A+}') then
         local male, female = cmd:match('{gender:(%A+)|(%A+)}')
-        if  gender == 0 then
+        if  configuration.main_settings.gender == 0 then
             local gendermsg = cmd:gsub('{gender:%A+|%A+}', male, 1)
             sampSendChat(tostring(gendermsg))
             return false
