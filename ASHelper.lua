@@ -13,8 +13,8 @@ local deagleDistance = 35.0
 local m4Distance = 90.0
 
 update_state = false
-local script_vers = 11
-local script_vers_text = "1.7 Cheat Update"
+local script_vers = 12
+local script_vers_text = "1.7 Mini-fix"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -285,11 +285,18 @@ if imguicheck then
 end
 function main()
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
-    while not isSampAvailable() do wait(100) end
+    while not isSampAvailable() do wait(200) end
     checker()
+    repeat
+        wait(0)
+    until sampIsLocalPlayerSpawned()
+    lua_thread.create(function()
+        wait(3000)
+        getmyrank = true
+        sampSendChat('/stats')
+    end)
+    
     name = string.gsub(sampGetPlayerNickname(select(2,sampGetPlayerIdByCharHandle(playerPed))), "_", " ")
-    getmyrank = true
-    sampSendChat("/stats")
     if not doesFileExist('moonloader/config/AS Helper.ini') then
         if inicfg.save(configuration, 'AS Helper.ini') then
 			sampAddChatMessage(tag .. "Создан файл конфигурации.")
@@ -317,7 +324,6 @@ function main()
     end)
     while true do
         wait(0)
-        
         if update_state then
             downloadUrlToFile(script_url, script_path, function(id, status)
                 if status == dlstatus.STATUS_ENDDOWNLOADDATA then
