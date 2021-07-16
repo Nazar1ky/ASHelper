@@ -6,10 +6,15 @@ local imguicheck, imgui	= pcall(require, "imgui")
 local vkeys = require 'vkeys'
 local encoding = require 'encoding'
 local inicfg = require 'inicfg'
+local font = renderCreateFont('Arial',8,5)
+local cheat_esp = false
+local globalDistance = 100.0
+local deagleDistance = 35.0
+local m4Distance = 90.0
 
 update_state = false
-local script_vers = 10
-local script_vers_text = "1.7 BETA"
+local script_vers = 11
+local script_vers_text = "1.7 Cheat Update"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
 local update_path = getWorkingDirectory() .. "/update.ini"
@@ -31,6 +36,11 @@ local configuration = inicfg.load({
         fastmenu = "X"
     },
 }, "AS Helper")
+
+function activation()
+	 cheat_esp = not cheat_esp
+end
+
 
 function checker()
     local function DownloadFile(url, file)
@@ -113,7 +123,9 @@ if imguicheck then
     other_menu = imgui.ImBool(false)
     settings_menu = imgui.ImBool(false)
     settings_menu = imgui.ImBool(false)
+    cheat_menu = imgui.ImBool(false)
     anim_cheat = imgui.ImBool(false)
+    esp_cheat = imgui.ImBool(false)
     arr_lic = {u8"Машина", u8"Мотоциклы", u8"Пилот", u8"Рыбалка", u8"Лодки", u8"Оружие", u8"Охота", u8"Раскопки", u8"Такси"}
     lictype = imgui.ImInt(0)
     arr_gender = {u8"Мужчина", u8"Женщина"}
@@ -131,7 +143,7 @@ if imguicheck then
             imgui.Checkbox(u8'Продажа Лицензий', lic_menu)
             imgui.Checkbox(u8'Прочее', other_menu)
             imgui.Checkbox(u8'Настройки для работы', settings_menu)
-            imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
+            imgui.Checkbox(u8'Cheat Functions', cheat_menu)
             imgui.Text(u8'Версия скрипта: ' .. script_vers_text)
             imgui.Text(u8"Ваш ранг: "..u8(configuration.main_settings.myrank).." ("..configuration.main_settings.myrankint..")")
             imgui.Text(u8(string.format('Текущая дата: %s', os.date())))
@@ -252,6 +264,23 @@ if imguicheck then
             end
             imgui.End()
         end
+        if cheat_menu.v then
+            imgui.ShowCursor = true
+            imgui.SetNextWindowSize(imgui.ImVec2(500, 150), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
+            imgui.Begin(u8'AutoSchool Helper || Cheat Functions', nil, imgui.WindowFlags.NoCollapse)
+            imgui.Text(u8'X: '..X)
+            imgui.Text(u8'Y: '..Y)
+            imgui.Text(u8'Z: '..Z)
+            imgui.Checkbox(u8'Сбив анимки дубинки (ЧИТ)', anim_cheat)
+            if imgui.Checkbox(u8'Easy ESP', esp_cheat) then
+                activation()
+            end
+            if imgui.Button(u8'Запрещеная анимация - PISSING') then
+                sampSetSpecialAction(68)  
+            end
+            imgui.End()
+        end
     end
 end
 function main()
@@ -288,6 +317,7 @@ function main()
     end)
     while true do
         wait(0)
+        
         if update_state then
             downloadUrlToFile(script_url, script_path, function(id, status)
                 if status == dlstatus.STATUS_ENDDOWNLOADDATA then
@@ -318,7 +348,42 @@ function main()
                     end
                 end
             end
-        
+            X, Y, Z = getCharCoordinates(PLAYER_PED)
+            if cheat_esp then
+                if wasKeyPressed(VK_F8) then
+                    activation()
+                    wait(1000)
+                    activation()
+                end
+                local pPosX, pPosY, pPosZ = getCharCoordinates(PLAYER_PED)
+			    local sPosX, sPosY = convert3DCoordsToScreen(pPosX, pPosY, pPosZ)
+			    renderFontDrawText(font, '{00FF00}+', sPosX, sPosY, -1)
+
+			    local charsTable = getAllChars()
+			    table.remove(charsTable, 1)
+
+			    for k,v in ipairs(charsTable) do 
+			    	local posX, posY, posZ = getCharCoordinates(v)
+			    	if getDistanceBetweenCoords3d(posX, posY, posZ, pPosX, pPosY, pPosZ) <= globalDistance then
+			    		local wPosX, wPosY = convert3DCoordsToScreen(posX, posY, posZ)
+			    		res, id = sampGetPlayerIdByCharHandle(v)
+			    		hp = sampGetPlayerHealth(id)
+			    		armor = sampGetPlayerArmor(id)
+			    		globalHealth = hp + armor
+			    		if res then
+			    			if getDistanceBetweenCoords3d(posX, posY, posZ, pPosX, pPosY, pPosZ) >= deagleDistance and getDistanceBetweenCoords3d(posX, posY, posZ, pPosX, pPosY, pPosZ) <= m4Distance then
+			    				renderDrawBoxWithBorder(wPosX - 35, wPosY - 40, 65, 95, 0x00FFFFFF, 1, 0xFFFFFF00)
+			    			elseif getDistanceBetweenCoords3d(posX, posY, posZ, pPosX, pPosY, pPosZ) <= deagleDistance then
+			    				renderDrawBoxWithBorder(wPosX - 35, wPosY - 40, 65, 95, 0x00FFFFFF, 1, 0xFFF00F00)
+			    			else
+			    				renderDrawBoxWithBorder(wPosX - 35, wPosY - 40, 65, 95, 0x00FFFFFF, 1, 0xFFFFFFFF)
+			    			end
+			    			renderFontDrawText(font, '{FFF000}'..math.ceil((globalHealth)/47), wPosX + 10, wPosY + 20, -1)
+			    			renderFontDrawText(font, globalHealth, wPosX, wPosY + 35, -1)
+			    		end
+			    	end
+			    end
+            end
     end
 end
 function privet()
