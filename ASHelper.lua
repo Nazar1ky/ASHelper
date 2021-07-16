@@ -8,7 +8,7 @@ local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 
 update_state = false
-local script_vers = 9
+local script_vers = 10
 local script_vers_text = "1.7 BETA"
 
 local update_url = "https://raw.githubusercontent.com/Nazar1ky/ASHelper/main/update.ini"
@@ -233,7 +233,7 @@ if imguicheck then
         end
         if settings_menu.v then
             imgui.ShowCursor = true
-            imgui.SetNextWindowSize(imgui.ImVec2(200, 100), imgui.Cond.FirstUseEver)
+            imgui.SetNextWindowSize(imgui.ImVec2(500, 150), imgui.Cond.FirstUseEver)
             imgui.SetNextWindowPos(imgui.ImVec2(ex / 2 - 515, ey / 2 - 220), imgui.Cond.FirstUseEver)
             imgui.Begin(u8'AutoSchool Helper || Настройки', nil, imgui.WindowFlags.NoCollapse)
             imgui.InputText(u8'Кнопка открытия меню', openmenu)
