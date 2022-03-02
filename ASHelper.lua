@@ -7,10 +7,6 @@ local vkeys = require 'vkeys'
 local encoding = require 'encoding'
 local inicfg = require 'inicfg'
 local font = renderCreateFont('Arial',8,5)
-local cheat_esp = false
-local globalDistance = 100.0
-local deagleDistance = 35.0
-local m4Distance = 90.0
 
 update_state = false
 local script_vers = 13
@@ -134,7 +130,6 @@ if imguicheck then
         if main_window_state.v then
             imgui.SetNextWindowSize(imgui.ImVec2(580, 250), imgui.Cond.FirstUseEver)
             imgui.Begin('AutoSchool Helper', main_window_state)
-            imgui.Text(u8'Добро пожаловать: ' .. configuration.main_settings.myrank)
             imgui.InputText(u8'ID Игрока для действия', playerID)
             imgui.Checkbox(u8'Автоматическое заполнение ID при нацеливании', checkbox2)
             imgui.Checkbox(u8'Цены на лицензии', isp_menu)
